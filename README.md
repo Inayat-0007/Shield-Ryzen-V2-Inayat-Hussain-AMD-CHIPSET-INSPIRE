@@ -37,30 +37,30 @@ Standard blink detectors fail because "normal" eyes vary by person and fatigue.
 
 ## 🛠️ Architecture
 
-```mermaid
-graph TD
-    A[Webcam Input] --> B{Shield-Face Pipeline};
-    B -->|Face Detect| C[MediaPipe Mesh 478pt];
-    B -->|Align & Crop| D[Normalization [-1, 1]];
-    
-    subgraph "NPU Inference Core"
-    D --> E[INT8 XceptionNet];
-    E --> F[Neural Verification];
-    end
-    
-    subgraph "Logic Unit (CPU)"
-    C --> G[DBS Blink Tracker];
-    C --> H[Head Pose Solver];
-    D --> I[Texture Analyzer];
-    end
-    
-    F --> J{Decision Fusion};
-    G --> J;
-    H --> J;
-    I --> J;
-    
-    J --> K[Secure HUD Overlay];
-    J --> L[Local Log];
+```text
+[ Webcam Input ] 
+       │
+       ▼
+[ 🛡️ Shield-Face Pipeline ]
+  │   ├───▶ [Face Detect (MediaPipe 478pt)]
+  │   │          │
+  │   │          ▼
+  │   │     [DBS Blink Tracker] 
+  │   │     [Head Pose Solver ]
+  │   │
+  │   └───▶ [Align & Crop (FF++ Norm)]
+  │              │
+  │              ▼
+  │     [INT8 XceptionNet (NPU)]
+  │              │
+  │              ▼
+  │      [Neural Verification]
+  │
+  ▼
+[ 🧠 Decision Fusion Logic ] ◀──(Texture Analysis)
+       │
+       ▼
+[ 🔒 Secure HUD Overlay ]
 ```
 
 ---
